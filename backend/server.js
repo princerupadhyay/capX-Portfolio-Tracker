@@ -23,7 +23,7 @@ const stockDataRoutes = require('./routes/stockDataRoutes.js')
 const connectToDB = require('./db.js');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware for parsing request bodies
 app.use(express.json());
