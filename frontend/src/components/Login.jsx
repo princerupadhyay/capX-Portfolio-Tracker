@@ -48,16 +48,22 @@ const Login = () => {
         window.dispatchEvent(loginEvent);
       }
 
-      if (!fullName) {
-        setNameModalOpen(true);
-      } else {
-        setUser((prevUser) => ({
-          ...prevUser,
-          fullName: fullName,
-        }));
-        const redirectPath = searchParams.get("redirect") || "/dashboard";
-        navigate(redirectPath, { replace: true });
-      }
+      // if (!fullName) {
+      //   setNameModalOpen(true);
+      // } else {
+      //   setUser((prevUser) => ({
+      //     ...prevUser,
+      //     fullName: fullName,
+      //   }));
+      //   const redirectPath = searchParams.get("redirect") || "/dashboard";
+      //   navigate(redirectPath, { replace: true });
+      // }
+      setUser((prevUser) => ({
+        ...prevUser,
+        fullName: fullName,
+      }));
+      const redirectPath = searchParams.get("redirect") || "/dashboard";
+      navigate(redirectPath, { replace: true });
     } catch (error) {
       const err =
         error.response && error.response.data
@@ -228,11 +234,11 @@ const Login = () => {
           )}
         </Formik>
       )}
-      <NameModal
+      {/* <NameModal
         open={nameModalOpen}
         onClose={() => setNameModalOpen(false)}
         onSubmit={handleNameSubmit}
-      />
+      /> */}
     </>
   );
 };
