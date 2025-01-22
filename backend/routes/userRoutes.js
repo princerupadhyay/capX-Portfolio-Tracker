@@ -201,6 +201,7 @@ router.get("/checkAuth", (req, res) => {
 
 // Get User Info
 router.get("/user", ensureAuthenticated, (req, res) => {
+    console.log('Req:', req);
     console.log('Session:', req.session); // Check if session exists
     console.log('User:', req.user);
     if (req.isAuthenticated()) {
