@@ -1,0 +1,65 @@
+/* General card styling */
+.stock-info {
+  padding: 1rem;
+}
+
+.stock-info-card {
+  width: 100%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* background-color: #121212; */
+}
+
+/* Header styling with logo and title */
+.stock-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ececec;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.stock-logo {
+  width: 80px;
+  border: 1px solid white;
+  padding: 1rem;
+  border-radius: 50%;
+}
+
+.stock-header h2 {
+  font-size: 24px;
+  color: #ececec;
+  margin-left: 1rem;
+}
+
+.stock-header span {
+  font-size: 18px;
+  color: #ececec;
+  margin-left: 8px;
+}
+
+/* Details styling */
+.stock-details p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #ababab;
+}
+
+.stock-details strong {
+  color: #ffffff;
+}
+
+.stock-details a {
+  color: #0073e6;
+  text-decoration: none;
+}
+
+.stock-details a:hover {
+  text-decoration: underline;
+}
+
+.stock-chart {
+  margin-top: 20px;
+}

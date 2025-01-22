@@ -1,0 +1,33 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #292929;
+  padding: 10px 20px;
+  border-bottom: 1px solid #444;
+}
+
+.capXlogo {
+  margin: 0;
+}
+
+.otherIcons {
+  display: flex;
+}
+
+.search-bar::placeholder {
+  color: #888;
+}
+
+.create-project-btn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-project-btn:hover {
+  background-color: #0056b3;
+}

@@ -1,0 +1,23 @@
+.RegisterPage {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  /* background-color: #000000; */
+  color: white;
+  overflow: hidden; /* Prevent scrollbar */
+}
+
+.RegisterBox {
+  border: 1px solid white;
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Initial subtle shadow */
+}
+
+.RegisterBox:hover {
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.5); /* Glowing effect on hover */
+}
