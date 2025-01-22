@@ -15,6 +15,7 @@ const PrivateRoute = ({ Component }) => {
           "https://capx-portfolio-tracker.onrender.com/auth/checkAuth",
           { withCredentials: true }
         );
+        console.log("checkAuth Response: ", response);
         setIsAuthenticated(response.data.isAuthenticated);
       } catch (error) {
         setIsAuthenticated(false);
