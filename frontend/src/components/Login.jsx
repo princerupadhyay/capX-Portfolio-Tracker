@@ -75,6 +75,12 @@ const Login = () => {
     setLoading(true);
     console.log("Entered");
     try {
+      const authToken = localStorage.getItem("authToken");
+
+      if (!authToken) {
+        throw new Error("User is not authenticated.");
+      }
+
       await axios.put(
         "https://capx-portfolio-tracker.onrender.com/auth/update-name",
         {
