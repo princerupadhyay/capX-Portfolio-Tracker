@@ -12,7 +12,7 @@ const PrivateRoute = ({ Component }) => {
     const checkAuth = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/auth/checkAuth",
+          "https://capx-portfolio-tracker.onrender.com/auth/checkAuth",
           { withCredentials: true }
         );
         setIsAuthenticated(response.data.isAuthenticated);

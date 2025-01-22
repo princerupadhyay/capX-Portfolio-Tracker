@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/portfolio';
+const API_BASE_URL = 'https://capx-portfolio-tracker.onrender.com/portfolio';
 
 // Fetch all stocks
 export const getPortfolio = async () => {

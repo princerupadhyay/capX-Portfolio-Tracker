@@ -6,7 +6,6 @@ const passport = require('passport'); // For authentication
 const LocalStrategy = require("passport-local").Strategy;
 const path = require('path');
 const stockInfo = require("./utils/stockInfo.js"); // Your stock data file
-const ExpressError = require('./utils/ExpressError.js');
 
 
 // Models
@@ -30,7 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Replace with the actual origin of your frontend
+  origin: 'https://cap-x-portfolio-tracker-frontend.vercel.app/', // Replace with the actual origin of your frontend
   credentials: true
 }));
 
@@ -40,7 +39,7 @@ app.use(session(
     secret: 'AbraKaDabra',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }
+    cookie: { secure: process.env.NODE_ENV === 'production' }
   }
 ));
 
@@ -62,7 +61,6 @@ app.use('/notification', notificationRoutes); // '/notification' is the base pat
 app.use('/stocks', stockDataRoutes); // '/notification' is the base path for the notification routes
 
 // Serve static files from the Vite build directory
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Endpoint to get all stocks
@@ -73,10 +71,9 @@ app.get("/stocksInfo", (req, res) => {
 // Connecting to MongoDB
 connectToDB(); // Call the function to connect to the database
 
-app.all("*", (req, res, next) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-  // next(new ExpressError(404, "Page Not Found!"));
-})
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

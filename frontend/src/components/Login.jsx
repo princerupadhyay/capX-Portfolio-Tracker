@@ -34,7 +34,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/auth/login",
+        "https://capx-portfolio-tracker.onrender.com/auth/login",
         values
       );
 
@@ -74,9 +74,12 @@ const Login = () => {
   const handleNameSubmit = async (name) => {
     setLoading(true);
     try {
-      await axios.put("http://localhost:3000/auth/update-name", {
-        fullName: name,
-      });
+      await axios.put(
+        "https://capx-portfolio-tracker.onrender.com/auth/update-name",
+        {
+          fullName: name,
+        }
+      );
       setUser((prevUser) => ({
         ...prevUser,
         fullName: name,

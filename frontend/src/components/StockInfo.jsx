@@ -135,7 +135,7 @@ const StockInfo = () => {
       <div className="stock-info-card">
         <div className="stock-header">
           <img
-            src={`http://localhost:3000${stock.img.light}`}
+            src={`https://capx-portfolio-tracker.onrender.com${stock.img.light}`}
             alt={`${stock.name} logo`}
             className="stock-logo"
           />

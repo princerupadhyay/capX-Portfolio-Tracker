@@ -17,11 +17,6 @@ const JWT_SECRET = process.env.JWT_SECRET;  // You can use environment variables
 
 const API_KEY = process.env.FINNHUB_API_KEY;
 
-// Render the registration page (GET)
-router.get("/register", (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist', 'index.html'));
-});
-
 // Registration route (POST)
 router.post("/register", async (req, res, next) => {
     const { username, email, password } = req.body;
@@ -94,13 +89,6 @@ router.post("/register", async (req, res, next) => {
         console.error('Error registering user:', error);
         next(new ExpressError(500, 'Server error')); // Pass error to the error handling middleware
     }
-});
-
-
-
-// Render the login page (GET)
-router.get("/login", (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist', 'index.html'));
 });
 
 // Login route (POST)
@@ -188,10 +176,6 @@ router.put("/update", ensureAuthenticated, async (req, res, next) => {
         console.error('Error updating profile:', error);
         next(new ExpressError(500, 'Server error'));
     }
-});
-
-router.get("/dashboard", ensureAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist', 'index.html'));
 });
 
 

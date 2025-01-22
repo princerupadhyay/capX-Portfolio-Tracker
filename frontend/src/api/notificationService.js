@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/notification';
+const API_BASE_URL = 'https://capx-portfolio-tracker.onrender.com/notification';
 
 // API to save a notification
 export const saveNotification = async (userId, message, type) => {

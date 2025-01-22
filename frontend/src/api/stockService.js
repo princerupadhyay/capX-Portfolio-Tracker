@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Define the base URL for the API
-const API_BASE_URL = "http://localhost:3000"; // Update as needed for your backend
+const API_BASE_URL = "https://capx-portfolio-tracker.onrender.com"; // Update as needed for your backend
 
 // Fetch stock info by ticker
 export const fetchStockData = async (ticker) => {

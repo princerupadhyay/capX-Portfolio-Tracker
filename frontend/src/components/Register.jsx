@@ -15,7 +15,7 @@ const validationSchema = Yup.object({
     .test("Unique-username", "*Username already taken", async (value) => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/auth/newUsername",
+          "https://capx-portfolio-tracker.onrender.com/auth/newUsername",
           { username: value }
         );
         console.log("API response:", response.data);
@@ -50,7 +50,7 @@ const Register = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/auth/register",
+        "https://capx-portfolio-tracker.onrender.com/auth/register",
         values
       );
       navigate("/login");
