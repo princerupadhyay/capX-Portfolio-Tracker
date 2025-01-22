@@ -72,8 +72,8 @@ app.get("/stocksInfo", (req, res) => {
 // Connecting to MongoDB
 connectToDB(); // Call the function to connect to the database
 
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+app.use("/", (req, res) => {
+  res.status(200).json({ success: "The backend is running" });
 });
 
 // Error handling middleware
