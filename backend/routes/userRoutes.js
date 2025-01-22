@@ -192,6 +192,9 @@ router.post("/:newUsername", async (req, res) => {
 
 // Check Authentication status route
 router.get("/checkAuth", (req, res) => {
+    console.log('Req:', req);
+    console.log('Session:', req.session); // Check if session exists
+    console.log('User:', req.user);
     if (req.isAuthenticated()) {
         return res.status(200).json({ isAuthenticated: true });
     } else {
@@ -201,9 +204,6 @@ router.get("/checkAuth", (req, res) => {
 
 // Get User Info
 router.get("/user", ensureAuthenticated, (req, res) => {
-    console.log('Req:', req);
-    console.log('Session:', req.session); // Check if session exists
-    console.log('User:', req.user);
     if (req.isAuthenticated()) {
         res.status(200).json({ user: req.user });
     } else {
