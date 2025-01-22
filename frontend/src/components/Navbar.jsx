@@ -20,7 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { NotificationContext } from "../contexts/NotificationContext";
-import { isUserLoggedIn } from "../utils/IsUserLoggedIn";
+import { isUserLoggedIn } from "../utils/isUserLoggedIn";
 import { useMediaQuery } from "react-responsive";
 
 const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
