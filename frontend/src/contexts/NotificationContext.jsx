@@ -15,9 +15,12 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/auth/user", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "https://capx-portfolio-tracker.onrender.com/auth/user",
+          {
+            withCredentials: true,
+          }
+        );
         const user = response.data.user;
         setUserId(user._id);
       } catch (error) {
