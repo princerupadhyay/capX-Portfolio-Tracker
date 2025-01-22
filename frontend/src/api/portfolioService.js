@@ -34,6 +34,6 @@ export const getPortfolioValue = async () => {
 
 // Fetch stock price
 export const fetchStockPrice = async (ticker) => {
-    const response = await axios.get(`${API_BASE_URL}/stocks/${ticker}/price`, { withCredentials: true });
+    const response = await axios.get(`https://capx-portfolio-tracker.onrender.com/stocks/${ticker}/price`, { withCredentials: true });
     return response.data;
 };

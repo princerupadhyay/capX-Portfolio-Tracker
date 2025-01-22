@@ -30,7 +30,9 @@ const UserProfilePage = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/auth/user`);
+        const response = await axios.get(
+          `https://capx-portfolio-tracker.onrender.com/auth/user`
+        );
         setUser(response.data.user);
         setUpdatedUser({
           username: response.data.user.username,
@@ -69,7 +71,7 @@ const UserProfilePage = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:3000/auth/update",
+        "https://capx-portfolio-tracker.onrender.com/auth/update",
         updatedUser
       );
       if (response.status === 200) {
