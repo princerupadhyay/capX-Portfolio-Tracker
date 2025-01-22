@@ -57,8 +57,21 @@ app.use(passport.session()); // Keeps users logged in during their session.
 passport.use(new LocalStrategy({ usernameField: 'email' }, User.authenticate())); // Uses passport-local-mongoose's authenticate method. This uses the authenticate method from the User model to validate user credentials.
 
 // Seralizing and Deserializing Users
-passport.serializeUser(User.serializeUser()); // Stores the user ID and other user related information in the session to keep the user logged in.
-passport.deserializeUser(User.deserializeUser()); // Retrieves the full user object from the user ID stored in the session when needed.
+passport.serializeUser((user, done) => {
+  console.log('Serializing user:', user); // Check user object being serialized
+  done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    console.log('Deserialized user:', user); // Check user object being deserialized
+    done(null, user);
+  } catch (err) {
+    console.error('Error deserializing user:', err);
+    done(err);
+  }
+});
 
 // Connecting different routes with app
 app.use('/auth', userRoutes); // '/auth' is the base path for the authentication routes
