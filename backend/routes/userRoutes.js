@@ -178,7 +178,6 @@ router.put("/update", ensureAuthenticated, async (req, res, next) => {
     }
 });
 
-
 // Check Uniqueness of new Username
 router.post("/:newUsername", async (req, res) => {
     const { username } = req.body;
@@ -192,25 +191,16 @@ router.post("/:newUsername", async (req, res) => {
 });
 
 // Check Authentication status route
-// router.get("/checkAuth", (req, res) => {
-//     if (req.isAuthenticated()) {
-//         console.log("AAgya andar");
-//         return res.status(200).json({ isAuthenticated: true });
-//     } else {
-//         console.log("Ghanta andr aya");
-//         return res.status(401).json({ isAuthenticated: false });
-//     }
-// });
-
-router.get('/checkAuth', passport.authenticate('local', { session: true }), (req, res) => {
-    console.log(req.session); // See if the session is persisted
-    console.log(req.user); // Ensure the user is authenticated
-    return res.status(200).json({ isAuthenticated: true });
+router.get("/checkAuth", (req, res) => {
+    if (req.isAuthenticated()) {
+        return res.status(200).json({ isAuthenticated: true });
+    } else {
+        return res.status(401).json({ isAuthenticated: false });
+    }
 });
 
-
 // Get User Info
-router.get("/user", (req, res) => {
+router.get("/user", ensureAuthenticated, (req, res) => {
     if (req.isAuthenticated()) {
         res.status(200).json({ user: req.user });
     } else {

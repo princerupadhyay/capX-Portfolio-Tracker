@@ -1,7 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors'); // Validating the backend port with frontend
-const session = require('express-session'); // For tracking user's session
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport'); // For authentication
 const LocalStrategy = require("passport-local").Strategy;
 const path = require('path');
@@ -35,14 +36,13 @@ app.use(cors({
 }));
 
 // Express session middleware
-app.use(session(
-  {
-    secret: 'AbraKaDabra',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
-  }
-));
+app.use(session({
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+  secret: 'AbraKaDabra',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
 
 // Initialize Passport middleware
 app.use(passport.initialize()); // Sets up Passport to handle user authentication.
@@ -52,17 +52,9 @@ app.use(passport.session()); // Keeps users logged in during their session.
 passport.use(new LocalStrategy({ usernameField: 'email' }, User.authenticate())); // Uses passport-local-mongoose's authenticate method. This uses the authenticate method from the User model to validate user credentials.
 
 // Seralizing and Deserializing Users
-passport.serializeUser((user, done) => {
-  done(null, user.id);  // Store user ID in the session
-});
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);  // Retrieve user by ID from database
-    done(null, user);  // Attach the user to the session
-  } catch (err) {
-    done(err, null);
-  }
-});
+passport.serializeUser(User.serializeUser()); // Stores the user ID and other user related information in the session to keep the user logged in.
+passport.deserializeUser(User.deserializeUser()); // Retrieves the full user object from the user ID stored in the session when needed.
+
 // Connecting different routes with app
 app.use('/auth', userRoutes); // '/auth' is the base path for the authentication routes
 app.use('/portfolio', portfolioRoutes); // '/portfolio' is the base path for the portfolio routes
