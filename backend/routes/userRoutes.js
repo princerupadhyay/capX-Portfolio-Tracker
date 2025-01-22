@@ -202,7 +202,7 @@ router.post("/:newUsername", async (req, res) => {
 //     }
 // });
 
-app.get('/checkAuth', passport.authenticate('local', { session: true }), (req, res) => {
+router.get('/checkAuth', passport.authenticate('local', { session: true }), (req, res) => {
     console.log(req.session); // See if the session is persisted
     console.log(req.user); // Ensure the user is authenticated
     return res.status(200).json({ isAuthenticated: true });
