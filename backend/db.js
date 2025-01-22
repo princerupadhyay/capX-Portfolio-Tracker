@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 // Initailising MongoDB Connection
 const connectToDB = async () => {
     try {
-        await mongoose.connect("mongodb://127.0.0.1:27017/portfolio");
+        const uri = process.env.MONGO_URI;
+        if (!uri) {
+            throw new Error("MongoDB connection URI is not defined in environment variables.");
+        }
+        await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         console.log("Connected to DB");
     }
     catch (err) {
