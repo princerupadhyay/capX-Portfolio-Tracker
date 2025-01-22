@@ -41,8 +41,13 @@ app.use(session({
   secret: 'AbraKaDabra',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production' }
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Ensure cookies are only secure in production
+    httpOnly: true, // Protect cookie from client-side JavaScript access
+    maxAge: 1000 * 60 * 60 * 24 // Set session cookie expiration time (optional)
+  }
 }));
+
 
 // Initialize Passport middleware
 app.use(passport.initialize()); // Sets up Passport to handle user authentication.
