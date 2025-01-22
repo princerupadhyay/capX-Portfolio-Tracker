@@ -32,6 +32,7 @@ const PrivateRoute = ({ Component }) => {
   }
 
   if (!isAuthenticated) {
+    console.log(isAuthenticated);
     console.log(`Redirecting to /login?redirect=${location.pathname}`);
     return <Navigate to={`/login?redirect=${location.pathname}`} />;
   }

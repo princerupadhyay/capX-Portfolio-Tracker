@@ -194,8 +194,10 @@ router.post("/:newUsername", async (req, res) => {
 // Check Authentication status route
 router.get("/checkAuth", (req, res) => {
     if (req.isAuthenticated()) {
+        console.log("AAgya andar");
         return res.status(200).json({ isAuthenticated: true });
     } else {
+        console.log("Ghanta andr aya");
         return res.status(401).json({ isAuthenticated: false });
     }
 });
