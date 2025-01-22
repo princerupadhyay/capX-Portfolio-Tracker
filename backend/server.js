@@ -40,7 +40,7 @@ app.use(session(
     secret: 'AbraKaDabra',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true }
+    cookie: { secure: process.env.NODE_ENV === 'production' }
   }
 ));
 
