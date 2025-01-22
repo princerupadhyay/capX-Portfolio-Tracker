@@ -201,7 +201,7 @@ router.get("/checkAuth", (req, res) => {
 });
 
 // Get User Info
-router.get("/user", ensureAuthenticated, (req, res) => {
+router.get("/user", (req, res) => {
     if (req.isAuthenticated()) {
         res.status(200).json({ user: req.user });
     } else {
