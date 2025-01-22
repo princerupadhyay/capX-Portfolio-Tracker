@@ -12,14 +12,13 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
 
+  // Fetch user information once
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const response = await axios.get(
           "https://capx-portfolio-tracker.onrender.com/auth/user",
-          {
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
         const user = response.data.user;
         setUserId(user._id);
@@ -28,16 +27,8 @@ export const NotificationProvider = ({ children }) => {
       }
     };
 
-    const intervalId = setInterval(() => {
-      if (!userId) {
-        fetchUserInfo();
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [userId]);
+    fetchUserInfo();
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {

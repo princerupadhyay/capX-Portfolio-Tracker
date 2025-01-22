@@ -73,18 +73,26 @@ const Login = () => {
 
   const handleNameSubmit = async (name) => {
     setLoading(true);
+    console.log("Entered");
     try {
       await axios.put(
         "https://capx-portfolio-tracker.onrender.com/auth/update-name",
         {
           fullName: name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
         }
       );
+      console.log("Updated");
       setUser((prevUser) => ({
         ...prevUser,
         fullName: name,
       }));
       setNameModalOpen(false);
+      console.log("On way to redirect");
       const redirectPath = searchParams.get("redirect") || "/dashboard";
       navigate(redirectPath, { replace: true });
     } catch (error) {
