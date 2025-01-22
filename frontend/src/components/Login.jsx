@@ -101,6 +101,7 @@ const Login = () => {
           ? error.response.data
           : "An unexpected error occurred";
       const msg = err.message || err;
+      console.log("Error:", error);
       toast.error(msg, { theme: "dark" });
     } finally {
       setLoading(false);
