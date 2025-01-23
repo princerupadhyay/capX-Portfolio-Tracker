@@ -82,7 +82,8 @@ const saveStockDataToDb = async () => {
 };
 
 // Connect to MongoDB and call the function
-mongoose.connect('mongodb://localhost:27017/portfolio', { useNewUrlParser: true, useUnifiedTopology: true })
+const dbURI = process.env.MONGO_URI; // Fallback to local URI if MONGO_URI is not set
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
         saveStockDataToDb(); // Call the function to save stock data
