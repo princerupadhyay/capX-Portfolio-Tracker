@@ -14,11 +14,9 @@ const validationSchema = Yup.object({
     .required("*Required")
     .test("Unique-username", "*Username already taken", async (value) => {
       try {
-        const response = await axios.post(
-          "https://capx-portfolio-tracker.onrender.com/auth/newUsername",
-          { username: value }
-        );
-        console.log("API response:", response.data);
+        const response = await axios.post("/auth/newUsername", {
+          username: value,
+        });
         return response.data.isUnique;
       } catch (error) {
         console.error("Error validating username:", error);
@@ -49,15 +47,14 @@ const Register = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "https://capx-portfolio-tracker.onrender.com/auth/register",
-        values
-      );
+      const response = await axios.post("/auth/register", values);
+      localStorage.setItem("authToken", response.data.authToken);
+
       navigate("/login");
     } catch (error) {
       const message =
         error.response && error.response.data
-          ? error.response.data
+          ? error.response.data.message
           : "An unexpected error occurred";
       console.error("Registration error:", message);
       toast.error(message, { theme: "dark" });

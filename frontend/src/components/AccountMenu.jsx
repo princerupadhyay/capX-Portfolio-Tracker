@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -10,10 +10,9 @@ import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import { ArrowDropDown } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../contexts/UserContext";
 import { useMediaQuery, useTheme } from "@mui/material";
 import Loading from "./Loading";
-import { useState, useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
 
 export default function AccountMenu() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -22,6 +21,36 @@ export default function AccountMenu() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("authToken");
+
+      if (token) {
+        try {
+          const response = await axios.get("/auth/user", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          setUser({
+            id: response.data.user.id,
+            username: response.data.user.username,
+            fullName: response.data.user.fullName || "Guest",
+          });
+        } catch (error) {
+          console.error("Error fetching user details:", error);
+          localStorage.removeItem("authToken");
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+      }
+    };
+
+    fetchUserInfo();
+  }, [setUser]);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -39,11 +68,10 @@ export default function AccountMenu() {
   const handleLogout = async () => {
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      await axios.get("/auth/logout");
-      localStorage.removeItem("authToken");
-      setUser(null);
-      navigate("/login");
+      await axios.post("/auth/logout"); // Notify the backend if needed
+      localStorage.removeItem("authToken"); // Remove the JWT
+      setUser(null); // Reset the user context
+      navigate("/login"); // Redirect to login
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -56,8 +84,8 @@ export default function AccountMenu() {
     return <Loading />;
   }
 
-  let fullName = (user && user.fullName) || "Guest";
-  let firstName = fullName.split(" ")[0];
+  const fullName = user?.fullName || "Guest";
+  const firstName = fullName.split(" ")[0];
 
   return (
     <React.Fragment>

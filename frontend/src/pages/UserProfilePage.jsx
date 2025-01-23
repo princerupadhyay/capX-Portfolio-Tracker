@@ -13,6 +13,11 @@ import {
 } from "@mui/material";
 import { UserContext } from "../contexts/UserContext";
 
+// Function to get JWT token from localStorage
+const getToken = () => {
+  return localStorage.getItem("authToken");
+};
+
 const UserProfilePage = () => {
   const { user, setUser } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
@@ -30,9 +35,18 @@ const UserProfilePage = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const response = await axios.get(
-          `https://capx-portfolio-tracker.onrender.com/auth/user`
-        );
+        const token = getToken();
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get("/auth/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         setUser(response.data.user);
         setUpdatedUser({
           username: response.data.user.username,
@@ -42,13 +56,14 @@ const UserProfilePage = () => {
       } catch (error) {
         console.error("Error fetching user:", error);
         setUser(false);
+        navigate("/login");
       } finally {
         setLoading(false);
       }
     };
 
     checkUser();
-  }, []);
+  }, [setUser, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,14 +85,17 @@ const UserProfilePage = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.put(
-        "https://capx-portfolio-tracker.onrender.com/auth/update",
-        updatedUser
-      );
+      const token = getToken();
+      const response = await axios.put("/auth/update", updatedUser, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       if (response.status === 200) {
         setSnackbarMessage("Profile updated successfully!");
         setOpenSnackbar(true);
-        setUser(updatedUser);
+        setUser(updatedUser); // Immediately update user context
 
         setLoading(true);
         setTimeout(() => {

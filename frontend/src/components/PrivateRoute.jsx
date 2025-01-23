@@ -11,13 +11,22 @@ const PrivateRoute = ({ Component }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get(
-          "https://capx-portfolio-tracker.onrender.com/auth/checkAuth",
-          { withCredentials: true }
-        );
-        console.log("checkAuth Response: ", response);
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+          setIsAuthenticated(false);
+          return;
+        }
+        const response = await axios.get("/auth/checkAuth", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // If the response indicates the user is authenticated
         setIsAuthenticated(response.data.isAuthenticated);
       } catch (error) {
+        // If there's an error (e.g., token expired, invalid), user is not authenticated
         setIsAuthenticated(false);
       } finally {
         setLoading(false);
@@ -32,7 +41,6 @@ const PrivateRoute = ({ Component }) => {
   }
 
   if (!isAuthenticated) {
-    console.log(isAuthenticated);
     console.log(`Redirecting to /login?redirect=${location.pathname}`);
     return <Navigate to={`/login?redirect=${location.pathname}`} />;
   }

@@ -12,24 +12,41 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
 
-  // Fetch user information once
+  // Poll userId every second until it is fetched
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await axios.get(
-          "https://capx-portfolio-tracker.onrender.com/auth/user",
-          { withCredentials: true }
-        );
+        const token = localStorage.getItem("authToken");
+
+        if (!token) {
+          throw new Error("No token found");
+        }
+
+        const response = await axios.get("/auth/user", {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add token to the Authorization header
+          },
+        });
+
         const user = response.data.user;
-        setUserId(user._id);
+        setUserId(user.id);
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
     };
 
-    fetchUserInfo();
-  }, []);
+    const interval = setInterval(() => {
+      if (!userId) {
+        fetchUserInfo(); // Keep polling until userId is fetched
+      }
+    }, 1000);
 
+    return () => {
+      clearInterval(interval); // Cleanup on unmount
+    };
+  }, [userId]); // Dependency on userId to stop polling once fetched
+
+  // Fetch notifications once userId is fetched
   useEffect(() => {
     const fetchNotifications = async () => {
       if (userId) {
@@ -42,13 +59,17 @@ export const NotificationProvider = ({ children }) => {
       }
     };
 
-    fetchNotifications();
-  }, [userId]);
-
-  const addNotification = async (message, action) => {
     if (userId) {
+      fetchNotifications(); // Fetch notifications once userId is available
+    }
+  }, [userId]); // Only run when userId changes
+
+  // Add a new notification
+  const addNotification = async (message, action) => {
+    const token = localStorage.getItem("authToken");
+    if (userId && token) {
       try {
-        await saveNotification(userId, message, action);
+        await saveNotification(userId, message, action, token);
         const updatedNotifications = await getNotifications(userId);
         setNotifications(updatedNotifications);
       } catch (error) {
@@ -57,10 +78,12 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Clear all notifications
   const clearAllNotifications = async () => {
-    if (userId) {
+    const token = localStorage.getItem("authToken");
+    if (userId && token) {
       try {
-        await clearNotifications(userId);
+        await clearNotifications(userId, token);
         setNotifications([]);
       } catch (error) {
         console.error("Error clearing notifications:", error);
@@ -70,7 +93,11 @@ export const NotificationProvider = ({ children }) => {
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, addNotification, clearAllNotifications }}
+      value={{
+        notifications,
+        addNotification,
+        clearAllNotifications,
+      }}
     >
       {children}
     </NotificationContext.Provider>

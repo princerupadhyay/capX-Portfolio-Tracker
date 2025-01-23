@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { ensureAuthenticated } = require('../middlewares/authMiddleware.js');
 const User = require('../models/user.js');
 const Notification = require('../models/notification.js');
+
 
 // Helper function to add notification to a user
 const addNotificationToUser = async (userId, message, type) => {
@@ -25,10 +27,11 @@ const addNotificationToUser = async (userId, message, type) => {
     }
 };
 
-// Route to save a notification
-router.post('/save', async (req, res) => {
+// Route to save a notification (protected)
+router.post('/save', ensureAuthenticated, async (req, res) => {
     try {
-        const { userId, message, type } = req.body;
+        const { message, type } = req.body;
+        const userId = req.user.id;
 
         // Call the helper function to add notification to the user
         await addNotificationToUser(userId, message, type);
@@ -40,10 +43,12 @@ router.post('/save', async (req, res) => {
     }
 });
 
-// Route to fetch all notifications for a user
-router.get('/:userId', async (req, res) => {
+// Route to fetch all notifications for a user (protected)
+router.get('/', ensureAuthenticated, async (req, res) => {
     try {
-        const user = await User.findById(req.params.userId).populate('notifications');
+        const userId = req.user.id;
+        // Fetch user and populate notifications
+        const user = await User.findById(userId).populate('notifications');
         res.status(200).json({ notifications: user.notifications });
     } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -51,10 +56,10 @@ router.get('/:userId', async (req, res) => {
     }
 });
 
-// Route to clear all notifications for a user
-router.delete('/:userId', async (req, res) => {
+// Route to clear all notifications for a user (protected)
+router.delete('/', ensureAuthenticated, async (req, res) => {
     try {
-        const userId = req.params.userId;
+        const userId = req.user.id; // Get userId from the decoded token
 
         // Find the user and remove all notification references from their notifications array
         const user = await User.findById(userId);
@@ -72,6 +77,5 @@ router.delete('/:userId', async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to clear notifications.' });
     }
 });
-
 
 module.exports = router;

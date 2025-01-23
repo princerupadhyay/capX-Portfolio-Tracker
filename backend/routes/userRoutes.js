@@ -1,19 +1,17 @@
 const express = require('express');
-const passport = require('passport');
-const path = require('path');
+const bcrypt = require('bcryptjs'); // For hashing passwords
+const jwt = require('jsonwebtoken'); // For generating and verifying JWTs
 const User = require('../models/user.js');
 const ExpressError = require('../utils/ExpressError.js');
 const Stock = require("../models/stock.js");
 const Notification = require('../models/notification.js'); // Import Notification model
-const jwt = require('jsonwebtoken');
 const { ensureAuthenticated } = require('../middlewares/authMiddleware.js');
-
 
 const axios = require('axios');
 
 const router = express.Router(); // We use the router to define our routes separately and then export them.
 
-const JWT_SECRET = process.env.JWT_SECRET;  // You can use environment variables for this in production
+const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';  // You can use environment variables for this in production
 
 const API_KEY = process.env.FINNHUB_API_KEY;
 
@@ -28,9 +26,8 @@ router.post("/register", async (req, res, next) => {
             return next(new ExpressError(400, 'Email already exists'));
         }
 
-        // Create new user
-        const newUser = new User({ username, email });
-        await User.register(newUser, password); // Register with the provided password
+        // Create a new user
+        const newUser = new User({ username, email, password });
 
         // List of available stocks
         const availableStocks = [
@@ -84,7 +81,12 @@ router.post("/register", async (req, res, next) => {
 
         await newUser.save(); // Save the updated user
 
-        res.status(201).json({ message: 'User registered successfully', portfolio: newUser.portfolio });
+        // Generate JWT
+        const token = jwt.sign({ id: newUser._id, username: newUser.username, email: newUser.email, fullName: newUser.fullName }, JWT_SECRET, {
+            expiresIn: '1d', // Token valid for 1 day
+        });
+
+        res.status(201).json({ message: 'User registered successfully', token, portfolio: newUser.portfolio });
     } catch (error) {
         console.error('Error registering user:', error);
         next(new ExpressError(500, 'Server error')); // Pass error to the error handling middleware
@@ -92,48 +94,51 @@ router.post("/register", async (req, res, next) => {
 });
 
 // Login route (POST)
-router.post("/login", (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            return next(err);
-        }
+router.post('/login', async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+        // Check if user exists
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid username or password' });
+            return res.status(401).json({ message: 'Invalid email or password' });
         }
-        req.logIn(user, (err) => {
-            if (err) {
-                return next(err);
+
+        // Validate password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Generate JWT
+        const authToken = jwt.sign(
+            { id: user._id, username: user.username, email: user.email, fullName: user.fullName, }, // Payload data
+            JWT_SECRET, // Secret key to sign the JWT
+            { expiresIn: '1h' } // Token expiry time
+        );
+
+        // Respond with token and user info
+        res.status(200).json({
+            message: 'Welcome to Revisor, You are logged in!',
+            authToken,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                fullName: user.fullName || '' // Default to empty string if fullName is not set
             }
-
-            // Generate the auth token (JWT)
-            const authToken = jwt.sign(
-                { id: user._id, username: user.username },  // Payload data
-                JWT_SECRET, // Secret key to sign the JWT
-                { expiresIn: '1h' }  // Token expiry time (optional)
-            );
-
-
-            return res.status(200).json({
-                message: 'Welcome to Revisor, You are logged in!',
-                authToken,
-                user: {
-                    id: user._id,
-                    username: user.username,
-                    email: user.email,
-                    fullName: user.fullName
-                }
-            });
         });
-    })(req, res, next);
+    } catch (error) {
+        console.error('Error during login:', error);
+        next(new ExpressError(500, 'Server error'));
+    }
 });
 
 
 router.get('/logout', async (req, res, next) => {
     try {
-        req.logout((err) => {
-            if (err) return next(err); // Pass error to error-handling middleware
-            // Respond with success message
-            res.status(200).json({ message: 'Logout successful' });
+        // Instruct the client to clear the token
+        res.status(200).json({
+            message: 'Logout successful.',
         });
     } catch (error) {
         next(error); // Pass unexpected errors to error-handling middleware
@@ -144,6 +149,14 @@ router.get('/logout', async (req, res, next) => {
 // Update the user's profile information
 router.put("/update", ensureAuthenticated, async (req, res, next) => {
     try {
+        const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+        if (!token) {
+            return res.status(401).json({ message: 'Authentication token is missing' });
+        }
+
+        // Verify the token
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const userId = decoded.id;
         const { email, username, fullName } = req.body;
 
         // Ensure the email, username, and full name are provided
@@ -153,26 +166,41 @@ router.put("/update", ensureAuthenticated, async (req, res, next) => {
 
         // Check if the email is already taken by another user
         const existingEmail = await User.findOne({ email });
-        if (existingEmail && existingEmail._id.toString() !== req.user._id.toString()) {
+        if (existingEmail && existingEmail._id.toString() !== userId) {
             return res.status(400).json({ message: 'Email is already taken by another user' });
         }
 
         // Check if the username is already taken by another user
         const existingUsername = await User.findOne({ username });
-        if (existingUsername && existingUsername._id.toString() !== req.user._id.toString()) {
+        if (existingUsername && existingUsername._id.toString() !== userId) {
             return res.status(400).json({ message: 'Username is already taken by another user' });
         }
 
         // Update the user's profile information
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         user.email = email;
         user.username = username;
         user.fullName = fullName;
 
         await user.save();
 
-        res.status(200).json({ message: 'Profile updated successfully', user: user });
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                fullName: user.fullName,
+            },
+        });
     } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Invalid or expired token' });
+        }
         console.error('Error updating profile:', error);
         next(new ExpressError(500, 'Server error'));
     }
@@ -190,26 +218,68 @@ router.post("/:newUsername", async (req, res) => {
     return res.json({ isUnique: true });
 });
 
+
 // Check Authentication status route
 router.get("/checkAuth", (req, res) => {
-    console.log('Req:', req);
-    console.log('Session:', req.session); // Check if session exists
-    console.log('User:', req.user);
-    if (req.isAuthenticated()) {
+    try {
+        const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+        if (!token) {
+            return res.status(401).json({ isAuthenticated: false, message: 'Token is missing' });
+        }
+
+        // Verify the token
+        jwt.verify(token, JWT_SECRET);
         return res.status(200).json({ isAuthenticated: true });
-    } else {
-        return res.status(401).json({ isAuthenticated: false });
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ isAuthenticated: false, message: 'Invalid or expired token' });
+        }
+        console.error('Error checking authentication:', error);
+        res.status(500).json({ isAuthenticated: false, message: 'Server error' });
     }
 });
 
 // Get User Info
-router.get("/user", ensureAuthenticated, (req, res) => {
-    if (req.isAuthenticated()) {
-        res.status(200).json({ user: req.user });
-    } else {
-        res.status(401).json({ message: 'Unauthorized' });
+router.get("/user", async (req, res) => {
+    try {
+        // Extract token from Authorization header
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ message: 'Token is missing' });
+        }
+
+        // Verify the token
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        // Retrieve user ID from token payload
+        const { id } = decoded;
+
+        // Fetch the full user data from the database using the user ID
+        const user = await User.findById(id).select("username email fullName");  // Select relevant fields
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Send back the full user info
+        res.status(200).json({
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                fullName: user.fullName,
+            }
+        });
+
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: 'Invalid or expired token' });
+        }
+        console.error('Error fetching user info:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 // Backend route
 router.get("/:userProfile", async (req, res) => {
@@ -235,26 +305,21 @@ router.get("/:userProfile", async (req, res) => {
 // Update the user's full name
 router.put("/update-name", ensureAuthenticated, async (req, res, next) => {
     try {
-        if (!req.isAuthenticated()) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-
         const { fullName } = req.body;
-
-        // Ensure the fullName is provided
-        if (!fullName || fullName.trim().length === 0) {
-            return res.status(400).json({ message: 'Full name is required' });
+        const userId = req.user.id; // Retrieve the userId from the decoded JWT token
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        // Update the fullName for the authenticated user
-        const user = await User.findById(req.user._id);
+        // Update the user's full name
         user.fullName = fullName;
         await user.save();
 
-        res.status(200).json({ message: 'Full name updated successfully' });
+        res.status(200).json({ message: 'Name updated successfully' });
     } catch (error) {
-        console.error('Error updating full name:', error);
-        next(new ExpressError(500, 'Server error'));
+        console.error('Error updating name:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

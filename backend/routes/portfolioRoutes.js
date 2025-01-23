@@ -12,8 +12,7 @@ const API_KEY = process.env.FINNHUB_API_KEY;
 // Fetch all stocks in the portfolio
 router.get('/', ensureAuthenticated, async (req, res, next) => {
     try {
-        const user = await User.findById(req.user._id).populate('portfolio'); // Populate the portfolio with full stock details
-
+        const user = await User.findById(req.user.id).populate('portfolio'); // Populate the portfolio with full stock details
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -43,7 +42,7 @@ router.post('/', ensureAuthenticated, async (req, res, next) => {
         await stock.save();
 
         // Add the stock's ObjectId to the user's portfolio
-        const user = await User.findById(req.user._id); // Get the current user
+        const user = await User.findById(req.user.id); // Get the current user
         user.portfolio.push(stock._id); // Add stock's ObjectId to user's portfolio
         await user.save(); // Save the user with the updated portfolio
 
@@ -81,7 +80,7 @@ router.delete('/:id', ensureAuthenticated, async (req, res, next) => {
         const { id } = req.params;
 
         // Remove stock from the portfolio
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user.id);
         user.portfolio.pull(id); // Remove the stock's ObjectId from the portfolio array
         await user.save();
 
@@ -99,7 +98,7 @@ router.delete('/:id', ensureAuthenticated, async (req, res, next) => {
 // Calculate the total portfolio value
 router.get('/value', ensureAuthenticated, async (req, res, next) => {
     try {
-        const stocks = await Stock.find({ userId: req.user._id });
+        const stocks = await Stock.find({ userId: req.user.id });
 
         if (!stocks || stocks.length === 0) {
             return res.status(404).json({ message: 'No stocks found in your portfolio' });

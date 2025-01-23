@@ -52,6 +52,7 @@ const Dashboard = () => {
       newNotification = `Action on ${stock.ticker} stock is unknown.`;
     }
 
+    console.log(newNotification, action);
     await addNotification(newNotification, action);
   };
 

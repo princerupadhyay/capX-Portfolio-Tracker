@@ -1,6 +1,11 @@
 import { createContext, useState, useEffect } from "react";
 import { fetchAllStocks, fetchStockPrice } from "../api/stockService";
 
+// Add the JWT token retrieval logic here
+const getToken = () => {
+  return localStorage.getItem("authToken"); // Assuming the token is stored in localStorage
+};
+
 export const StockContext = createContext();
 
 const PRICE_REFRESH_INTERVAL = 600000;
@@ -16,7 +21,12 @@ export const StockProvider = ({ children }) => {
       try {
         setLoading(true);
 
-        const fetchedStocks = await fetchAllStocks();
+        const token = getToken(); // Retrieve token from localStorage
+
+        const headers = token ? { Authorization: `Bearer ${token}` } : {}; // Add token to headers if available
+
+        // Fetch stocks with authorization headers (JWT)
+        const fetchedStocks = await fetchAllStocks(headers);
         setStocks(fetchedStocks);
 
         const savedPrices = JSON.parse(localStorage.getItem("stockPrices"));
@@ -35,7 +45,7 @@ export const StockProvider = ({ children }) => {
 
         const stockPrices = {};
         for (const stock of fetchedStocks) {
-          const price = await fetchStockPrice(stock.ticker);
+          const price = await fetchStockPrice(stock.ticker, headers); // Pass headers to fetch stock price
           stockPrices[stock.ticker] = price;
         }
 

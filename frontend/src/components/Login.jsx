@@ -15,7 +15,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [nameModalOpen, setNameModalOpen] = useState(false);
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email address").required("*Required"),
@@ -33,37 +33,29 @@ const Login = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "https://capx-portfolio-tracker.onrender.com/auth/login",
-        values
-      );
+      const response = await axios.post("/auth/login", values);
 
-      const { fullName } = response.data.user;
-      const { authToken } = response.data;
+      const {
+        authToken,
+        user: { fullName },
+      } = response.data;
 
       if (authToken) {
         localStorage.setItem("authToken", authToken);
-
+        setUser((prevUser) => ({
+          ...prevUser,
+          fullName: fullName,
+        }));
         const loginEvent = new Event("login");
         window.dispatchEvent(loginEvent);
       }
 
-      // if (!fullName) {
-      //   setNameModalOpen(true);
-      // } else {
-      //   setUser((prevUser) => ({
-      //     ...prevUser,
-      //     fullName: fullName,
-      //   }));
-      //   const redirectPath = searchParams.get("redirect") || "/dashboard";
-      //   navigate(redirectPath, { replace: true });
-      // }
-      setUser((prevUser) => ({
-        ...prevUser,
-        fullName: fullName,
-      }));
-      const redirectPath = searchParams.get("redirect") || "/dashboard";
-      navigate(redirectPath, { replace: true });
+      if (!fullName) {
+        setNameModalOpen(true);
+      } else {
+        const redirectPath = searchParams.get("redirect") || "/dashboard";
+        navigate(redirectPath, { replace: true });
+      }
     } catch (error) {
       const err =
         error.response && error.response.data
@@ -79,32 +71,29 @@ const Login = () => {
 
   const handleNameSubmit = async (name) => {
     setLoading(true);
-    console.log("Entered");
     try {
-      const authToken = localStorage.getItem("authToken");
+      const token = localStorage.getItem("authToken");
 
-      if (!authToken) {
-        throw new Error("User is not authenticated.");
+      if (!token) {
+        throw new Error("Authentication token is missing");
       }
 
       await axios.put(
-        "https://capx-portfolio-tracker.onrender.com/auth/update-name",
+        "/auth/update-name",
         {
           fullName: name,
         },
         {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("Updated");
       setUser((prevUser) => ({
         ...prevUser,
         fullName: name,
       }));
       setNameModalOpen(false);
-      console.log("On way to redirect");
       const redirectPath = searchParams.get("redirect") || "/dashboard";
       navigate(redirectPath, { replace: true });
     } catch (error) {
@@ -113,7 +102,6 @@ const Login = () => {
           ? error.response.data
           : "An unexpected error occurred";
       const msg = err.message || err;
-      console.log("Error:", error);
       toast.error(msg, { theme: "dark" });
     } finally {
       setLoading(false);
@@ -234,11 +222,11 @@ const Login = () => {
           )}
         </Formik>
       )}
-      {/* <NameModal
+      <NameModal
         open={nameModalOpen}
         onClose={() => setNameModalOpen(false)}
         onSubmit={handleNameSubmit}
-      /> */}
+      />
     </>
   );
 };

@@ -20,7 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { NotificationContext } from "../contexts/NotificationContext";
-import { isUserLoggedIn } from "../utils/isUserLoggedIn";
+import { isUserLoggedIn } from "../utils/IsUserLoggedIn";
 import { useMediaQuery } from "react-responsive";
 
 const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
@@ -78,7 +78,6 @@ const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
             padding: "0.75rem",
           }}
         >
-          {/* Links added to the navbar */}
           <Link
             to="/"
             className="navbar-link"
@@ -147,7 +146,6 @@ const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
             </Badge>
           </IconButton>
         </Tooltip>
-        {/* Notifications Drawer */}
         <Drawer
           anchor="right"
           open={isDrawerOpen}
@@ -161,7 +159,6 @@ const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
             Notifications
           </Typography>
 
-          {/* Divider to separate title and notification list */}
           <Divider />
 
           <div
@@ -200,7 +197,7 @@ const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
                           marginRight: 2,
                         }}
                       >
-                        {getIcon(action)} {/* Display dynamic icon */}
+                        {getIcon(action)}
                       </Box>
                       <ListItemText
                         primary={notification.message}
@@ -214,7 +211,6 @@ const Navbar = ({ toggleDrawer, isDrawerOpen }) => {
                 })
               )}
             </List>
-            {/* Clear All Button */}
             <Button
               variant="text"
               fullWidth
