@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const StockData = require('../models/StockData'); // Import StockData model
+const StockData = require('../models/stockData'); // Import StockData model
 const StockInfo = require('./stockInfo'); // Import the stock info (from StockInfo.js)
 
 // Function to fetch historical stock data and update the StockInfo array

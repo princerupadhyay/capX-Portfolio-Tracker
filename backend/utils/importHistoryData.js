@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
 const csvParser = require('csv-parser');
-const StockData = require('../models/StockData'); // Import the StockData model
+const StockData = require('../models/stockData'); // Import the StockData model
 const StockInfo = require('./stockInfo'); // Import your stock info (from StockInfo.js)
 
 // Function to parse CSV and save data to MongoDB
