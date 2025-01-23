@@ -1,5 +1,5 @@
 const express = require('express');
-const StockData = require('../models/StockData'); // Import your StockData model
+const StockData = require('../models/stockData'); // Import your StockData model
 const router = express.Router();
 const axios = require('axios'); // Import axios for making HTTP requests to Finnhub
 
