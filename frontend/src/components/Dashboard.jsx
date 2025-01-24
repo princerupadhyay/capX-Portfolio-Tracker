@@ -9,7 +9,7 @@ import {
   getPortfolio,
 } from "../api/portfolioService";
 import Loading from "./Loading";
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import { toast } from "react-toastify";
 import { NotificationContext } from "../contexts/NotificationContext";
@@ -19,7 +19,7 @@ const Dashboard = () => {
   const [stocks, setStocks] = useState([]);
   const [editingStock, setEditingStock] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [setDrawerOpen] = useState(false);
   const { addNotification } = useContext(NotificationContext);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -119,15 +119,35 @@ const Dashboard = () => {
   return (
     <>
       <Container maxWidth={false}>
-        <Box sx={{ pt: 4, pb: 4 }}>
+        <Box sx={{ pt: 4, pb: 4}}>
+        <Typography
+        variant="h4"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+          textAlign: "center",
+          mb: 4,
+          textShadow: "2px 2px 4px rgba(255, 255, 255, 0.25)",
+        }}
+      >
+        Portfolio Dashboard
+      </Typography>
           <Paper
             elevation={3}
             sx={{
               backgroundColor: "#1e1e1e",
               borderRadius: 2,
-              minHeight: isMobile && "95rem",
+              height: "100%",
+              // minHeight: isMobile && "98rem",
+              display: "flex",
+              flexDirection: isMobile ? "column": "row",
+              justifyContent: !isMobile && "center",
+              alignItems: isMobile && "center",
+              paddingBottom: "2rem",
+              marginBottom: "2rem"
             }}
           >
+            
             <MiniDashboard
               stocks={stocks}
               StockList={StockList}

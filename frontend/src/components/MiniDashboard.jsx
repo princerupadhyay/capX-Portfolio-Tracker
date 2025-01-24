@@ -115,41 +115,35 @@ const MiniDashboard = ({
         color: "#fff",
         borderRadius: 2,
         maxWidth: "lg",
+        width: "100%",
         mx: "auto",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "space-evenly",
       }}
       style={{
         paddingLeft: "0.5rem",
         paddingRight: "0.5rem",
         paddingBottom: "1rem",
+        margin: "0rem"
       }}
     >
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{
-          fontWeight: "bold",
-          textAlign: "center",
-          mb: 4,
-          textShadow: "2px 2px 4px rgba(0, 0, 0, 0.6)",
-        }}
-      >
-        Portfolio Dashboard
-      </Typography>
-
-      <Grid container spacing={3} direction={isMobile ? "column" : "row"}>
+      
+      <Grid container spacing={3} direction={isMobile ? "column" : "row"} width="inherit">
         {/* Total Value Card */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} sm={6} md={6} lg={6} sx={{width: "inherit"}}>
           <Card
             sx={{
               backgroundColor: "#333",
               color: "#fff",
-              p: 3,
+              p: 2,
               boxShadow: 4,
               borderRadius: 2,
             }}
           >
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{}}>
                 Total Portfolio Value
               </Typography>
               <Typography
@@ -163,12 +157,12 @@ const MiniDashboard = ({
         </Grid>
 
         {/* Top-Performing Stock */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} sm={6} md={6} lg={6} sx={{width: "inherit"}}>
           <Card
             sx={{
               backgroundColor: "#333",
               color: "#fff",
-              p: 3,
+              p: 2,
               boxShadow: 4,
               borderRadius: 2,
             }}
@@ -202,12 +196,12 @@ const MiniDashboard = ({
         </Grid>
 
         {/* Portfolio Distribution Chart */}
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6} md={6} lg={6} sx={{width: "inherit"}}>
           <Paper
             sx={{
               backgroundColor: "#333",
               color: "#fff",
-              p: 4,
+              p: 2,
               boxShadow: 3,
               borderRadius: 2,
             }}
@@ -220,18 +214,20 @@ const MiniDashboard = ({
         </Grid>
 
         {/* Stock Holdings with Flip Effect */}
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6} md={6} lg={6}>
           <Box
             sx={{
               position: "relative",
               width: "100%",
-              perspective: 1000,
+              perspective: "1000px", // Adjust perspective for 3D effect
+              height: "28.5rem", // Consistent height
             }}
           >
             <Box
               sx={{
                 position: "relative",
                 width: "100%",
+                height: "100%",
                 transformStyle: "preserve-3d",
                 transition: "transform 0.8s",
                 transform: showForm ? "rotateY(180deg)" : "rotateY(0deg)",
@@ -242,6 +238,7 @@ const MiniDashboard = ({
                 sx={{
                   position: "absolute",
                   width: "100%",
+                  height: "100%",
                   backfaceVisibility: "hidden",
                 }}
               >
@@ -249,31 +246,24 @@ const MiniDashboard = ({
                   sx={{
                     backgroundColor: "#333",
                     color: "#fff",
-                    p: 4,
+                    p: 2,
                     boxShadow: 3,
                     borderRadius: 2,
+                    height: "100%",
                   }}
-                  style={{ maxHeight: "28.5rem" }}
                 >
                   <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
                     Top Holdings
                   </Typography>
-                  <div
-                    style={{
-                      minHeight: "25.5rem",
+                  <Box
+                    sx={{
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
+                      height: "calc(100% - 3rem)",
                     }}
                   >
-                    <div>
-                      <StockList
-                        stocks={stocks}
-                        onEdit={handleEditClick}
-                        onDelete={onDelete}
-                      />
-                    </div>
-
+                    <StockList stocks={stocks} onEdit={handleEditClick} onDelete={onDelete} />
                     <Button
                       variant="outlined"
                       sx={{
@@ -294,7 +284,7 @@ const MiniDashboard = ({
                     >
                       <AddIcon /> Add
                     </Button>
-                  </div>
+                  </Box>
                 </Paper>
               </Box>
 
@@ -303,6 +293,7 @@ const MiniDashboard = ({
                 sx={{
                   position: "absolute",
                   width: "100%",
+                  height: "100%",
                   backfaceVisibility: "hidden",
                   transform: "rotateY(180deg)",
                 }}
@@ -311,20 +302,22 @@ const MiniDashboard = ({
                   sx={{
                     backgroundColor: "#333",
                     color: "#fff",
+                    p: 1,
                     boxShadow: 3,
-                    p: 4,
                     borderRadius: 2,
+                    height: "100%",
+                    pb:4
                   }}
-                  style={{ minHeight: "28.5rem" }}
                 >
-                  <div
-                    style={{
-                      minHeight: "28.5rem",
+                  <Box
+                    sx={{
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
+                      height: "calc(100% - 3rem)",
                     }}
                   >
+                    
                     <StockForm
                       onSubmit={onSubmit}
                       editingStock={editingStock}
@@ -337,6 +330,7 @@ const MiniDashboard = ({
                         borderRadius: "1.25rem",
                         borderColor: "white",
                         textTransform: "none",
+                        mt: 3,
                         p1: 1,
                         pr: 2.5,
                         ml: 1,
@@ -352,7 +346,7 @@ const MiniDashboard = ({
                     >
                       <ArrowBackIcon /> Back
                     </Button>
-                  </div>
+                  </Box>
                 </Paper>
               </Box>
             </Box>

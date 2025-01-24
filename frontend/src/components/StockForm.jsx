@@ -7,7 +7,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { InputAdornment } from "@mui/material";
 import { SmallLoadingLight } from "./LoadingVariants";
 import { toast } from "react-toastify";
-
+import { useMediaQuery, useTheme } from "@mui/material";
 import { fetchStockPrice } from "../api/portfolioService";
 
 const StockForm = ({ onSubmit, editingStock, portfolioStocks, backToList }) => {
@@ -24,6 +24,8 @@ const StockForm = ({ onSubmit, editingStock, portfolioStocks, backToList }) => {
   });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const stockList = [
     { name: "Apple", ticker: "AAPL" },
@@ -288,7 +290,7 @@ const StockForm = ({ onSubmit, editingStock, portfolioStocks, backToList }) => {
         )}
       />
 
-      <div style={{ display: "flex" }}>
+      <div style={{ display: !isMobile && "flex", }}>
         <TextField
           label="Stock Price ($)"
           type="number"
@@ -310,7 +312,7 @@ const StockForm = ({ onSubmit, editingStock, portfolioStocks, backToList }) => {
           fullWidth
           sx={inputStyles}
           disabled={loading}
-          style={{ marginRight: "0.5rem" }}
+          style={{ marginRight: !isMobile && "0.5rem" }}
         />
 
         <TextField
@@ -324,7 +326,7 @@ const StockForm = ({ onSubmit, editingStock, portfolioStocks, backToList }) => {
           helperText={errors.quantity}
           fullWidth
           sx={inputStyles}
-          style={{ marginLeft: "0.5rem" }}
+          style={{ marginLeft: !isMobile && "0.5rem" }}
         />
       </div>
 
@@ -345,7 +347,7 @@ const StockForm = ({ onSubmit, editingStock, portfolioStocks, backToList }) => {
         variant="contained"
         color="primary"
         fullWidth
-        sx={{ py: 1.5, borderRadius: "2rem" }}
+        sx={{ py: 1.5, borderRadius: "2rem", }}
         loading={submitting}
         loadingIndicator={<SmallLoadingLight />}
         disabled={submitting}
