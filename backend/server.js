@@ -1,12 +1,8 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors'); // Validating the backend port with frontend
+const cors = require('cors');
 const path = require('path');
-const stockInfo = require("./utils/stockInfo.js"); // Your stock data file
-const ExpressError = require('./utils/ExpressError.js');
-
-// Models
-const User = require('./models/user.js');
+const stockInfo = require("./utils/stockInfo.js");
 
 // Routes
 const userRoutes = require('./routes/userRoutes.js');
@@ -28,16 +24,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: 'https://cap-x-portfolio-tracker-frontend.vercel.app',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'], // Add any headers your app uses
   secure: process.env.NODE_ENV === 'production'
 }));
 
 // Connecting different routes with app
-app.use('/auth', userRoutes); // '/auth' is the base path for the authentication routes
-app.use('/portfolio', portfolioRoutes); // '/portfolio' is the base path for the portfolio routes
-app.use('/notification', notificationRoutes); // '/notification' is the base path for the notification routes
-app.use('/stocks', stockDataRoutes); // '/stocks' is the base path for the stock data routes
+app.use('/auth', userRoutes);
+app.use('/portfolio', portfolioRoutes);
+app.use('/notification', notificationRoutes);
+app.use('/stocks', stockDataRoutes);
 
 // Serve static files from the Vite build directory
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
@@ -48,7 +42,7 @@ app.get("/stocksInfo", (req, res) => {
 });
 
 // Connecting to MongoDB
-connectToDB(); // Call the function to connect to the database
+connectToDB();
 
 // Error handling middleware
 app.use((err, req, res, next) => {
