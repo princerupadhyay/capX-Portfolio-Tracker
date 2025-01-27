@@ -82,7 +82,8 @@ const saveStockDataToDb = async () => {
 };
 
 // Connect to MongoDB and call the function
-mongoose.connect('mongodb+srv://princerupadhyay:princerupadhyay@portfoliotracker.ff1dw.mongodb.net/?retryWrites=true&w=majority&appName=PortfolioTracker', { useNewUrlParser: true, useUnifiedTopology: true })
+const dbURI = process.env.MONGO_URI;
+mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
         saveStockDataToDb(); // Call the function to save stock data
